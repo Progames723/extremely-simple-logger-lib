@@ -1,8 +1,7 @@
-//import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
-//	kotlin("jvm") version "2.2.0"
 	`java-library`
+	`maven-publish`
+	publishing
 }
 
 group = "dev.progames723.esll"
@@ -17,18 +16,22 @@ dependencies {
 }
 
 java {
+	withSourcesJar()
+}
 
+publishing {
+	publications {
+		create<MavenPublication>("maven") {
+			groupId = group as String
+			artifactId = "esll"
+			version = "1.0"
+
+			from(components["java"])
+		}
+	}
+	this.repositories.mavenLocal()
 }
 
 tasks.compileJava {
 	options.release.set(8)
 }
-/*
-kotlin {
-	this.target.compilerOptions.jvmTarget = JvmTarget.JVM_9
-	jvmToolchain(21)
-}
-
-tasks.compileKotlin {
-	this.compilerOptions.jvmTarget = JvmTarget.JVM_9
-}*/

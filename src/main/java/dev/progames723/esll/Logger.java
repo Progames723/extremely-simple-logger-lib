@@ -10,6 +10,9 @@ import java.time.temporal.ChronoField;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * the main logger
+ */
 @SuppressWarnings({"IOStreamConstructor", "unused", "ResultOfMethodCallIgnored", "DataFlowIssue", "removal"})
 public class Logger implements ILogger {
 	private final Level stdOutLoggingLevel;
@@ -39,59 +42,114 @@ public class Logger implements ILogger {
 		.appendValue(ChronoField.SECOND_OF_MINUTE, 2)
 		.toFormatter();
 	
+	/**
+	 * constructs a {@link Logger} has overloads
+	 * @param stdOutLoggingLevel it does explain itself nicely
+	 * @param loggerName same here
+	 * @param logToFiles and here
+	 */
 	public Logger(Level stdOutLoggingLevel, String loggerName, boolean logToFiles) {
 		this.stdOutLoggingLevel = stdOutLoggingLevel;
 		this.loggerName = loggerName;
 		this.logToFiles = logToFiles;
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 * @see #log(Level, String, Object...)
+	 */
 	public Logger(Level stdOutLoggingLevel, String loggerName) {
 		this(stdOutLoggingLevel, loggerName, true);
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 * @see #log(Level, String, Object...)
+	 */
 	public Logger(String loggerName, boolean logToFiles) {
 		this(Level.INFO, loggerName, logToFiles);
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 * @see #log(Level, String, Object...)
+	 */
 	public Logger(String loggerName) {
 		this(Level.INFO, loggerName, true);
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 * @see #log(Level, String, Object...)
+	 */
 	@Override
 	public void debug(String message, Object... args) {
 		doLog(Level.DEBUG, message == null ? "null" : message, args == null ? new Object[0] : args);
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 * @see #log(Level, String, Object...)
+	 */
 	@Override
 	public void trace(String message, Object... args) {
 		doLog(Level.TRACE, message == null ? "null" : message, args == null ? new Object[0] : args);
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 * @see #log(Level, String, Object...)
+	 */
 	@Override
 	public void info(String message, Object... args) {
 		doLog(Level.INFO, message == null ? "null" : message, args == null ? new Object[0] : args);
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 * @see #log(Level, String, Object...)
+	 */
 	@Override
 	public void warn(String message, Object... args) {
 		doLog(Level.WARN, message == null ? "null" : message, args == null ? new Object[0] : args);
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 * @see #log(Level, String, Object...)
+	 */
 	@Override
 	public void error(String message, Object... args) {
 		doLog(Level.ERROR, message == null ? "null" : message, args == null ? new Object[0] : args);
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 * @see #log(Level, String, Object...)
+	 */
 	@Override
 	public void fatal(String message, Object... args) {
 		doLog(Level.FATAL, message == null ? "null" : message, args == null ? new Object[0] : args);
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 * @param level {@inheritDoc}
+	 * @param message {@inheritDoc}
+	 * @param args {@inheritDoc}
+	 * @apiNote it inserts the arguments into the "{}" found in the message parameter <p>
+	 * if it doesn't find enough arguments it will leave the curly brackets in <p>
+	 * and if it doesn't find enough curly brackets for every remaining argument it discards them
+	 */
 	@Override
 	public void log(Level level, String message, Object... args) {
 		doLog(level == null ? Level.INFO : level, message == null ? "null" : message, args == null ? new Object[0] : args);
 	}
 	
+	/**
+	 * quite a handy method eh? <p>
+	 * very hacky
+	 */
 	private static File makeLogFile(boolean debug) {
 		File pathFile = new File((System.getProperty("user.dir") + "/logs").replace('\\', '/'));
 		Path path = pathFile.toPath();
@@ -122,6 +180,9 @@ public class Logger implements ILogger {
 		return pathFile;
 	}
 	
+	/**
+	 * my attempt at "async" file logging
+	 */
 	private CompletableFuture<Void> logToFile(String message, boolean debugFile) {
 		return CompletableFuture.runAsync(() -> {
 			if (debugFile) {
@@ -145,6 +206,9 @@ public class Logger implements ILogger {
 		});
 	}
 	
+	/**
+	 * the backbone method behind all this
+	 */
 	private void doLog(Level level, String message, Object[] args) {
 		AtomicBoolean hasException = new AtomicBoolean(false);
 		switch (level) {
@@ -169,6 +233,9 @@ public class Logger implements ILogger {
 		} catch (Exception ignored) {}
 	}
 	
+	/**
+	 * why am i writing documentation here
+	 */
 	private String format(Level level, String message, Object[] args, AtomicBoolean hasException) {
 		return '[' + ZonedDateTime.now().format(formatter) + "] (" +
 			loggerName + '/' + level + ") > " +
@@ -176,6 +243,9 @@ public class Logger implements ILogger {
 			'\n';
 	}
 	
+	/**
+	 * why am i writing documentation here
+	 */
 	private String customMessageFormat(String message, Object[] args, AtomicBoolean hasException) {
 		if (args == null) return message;
 		String[] split = message.split("\\{}", args.length == 0 ? 1 : args.length);
@@ -204,6 +274,9 @@ public class Logger implements ILogger {
 		return builder.toString();
 	}
 	
+	/**
+	 * used to close the streams ig
+	 */
 	@Override
 	protected void finalize() throws Throwable {
 		try {
