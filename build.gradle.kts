@@ -5,13 +5,15 @@ plugins {
 }
 
 group = "dev.progames723.esll"
-version = "1.1"
+version = "1.0"
 
 repositories {
 	mavenCentral()
 }
 
-dependencies {}
+dependencies {
+
+}
 
 java {
 	withSourcesJar()
@@ -22,7 +24,7 @@ publishing {
 		create<MavenPublication>("maven") {
 			groupId = group as String
 			artifactId = "esll"
-			version = project.version.toString()
+			version = "1.0"
 
 			from(components["java"])
 		}

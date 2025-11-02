@@ -7,7 +7,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -258,10 +257,10 @@ public class Logger implements ILogger {
 			Throwable throwable = null;
 			if (args[args.length - 1] instanceof Throwable) throwable = (Throwable) args[args.length - 1];
 			for (int i = 0; i < split.length; i++) {
+				builder.append(split[i].replace("{}", ""));
 				if (i < args.length) {
-					if (i + 1 != args.length || !(args[i] instanceof Throwable))
-						builder.append(split[i].replace("{}", Objects.toString(args[i])));
-				} else builder.append(split[i]);
+					if (i + 1 != args.length || !(args[i] instanceof Throwable)) builder.append(args[i]);
+				} else builder.append("{}");
 			}
 			if (throwable != null) {
 				hasException.set(true);
